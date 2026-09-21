@@ -1,6 +1,6 @@
 # Mirror, Mirror
 
-**Mirror, Mirror** is an offline pocket stylist that helps you explore your personal color season.
+**Mirror, Mirror** is an offline pocket stylist that helps you explore your personal color season. I wanted to build this completely offline independent of any AI calls. This is a vibe coded utility created with Claude Code. 
 
 ## What it does
 
