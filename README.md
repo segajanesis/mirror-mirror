@@ -1,6 +1,6 @@
 # Mirror, Mirror
 
-**Mirror, Mirror** is an offline pocket stylist that helps you explore your personal color season and silhouette type.
+**Mirror, Mirror** is an offline pocket stylist that helps you explore your personal color season.
 
 ## What it does
 
