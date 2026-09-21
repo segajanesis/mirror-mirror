@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirror, Mirror — your pocket stylist</title>
+<style>
+:root{
+  --ink:#241E28; --ink-soft:#5C5262; --paper:#F4F2F5; --panel:#FFFFFF;
+  --garnet:#8A2D44; --garnet-deep:#5E1D30; --gold:#A5824F; --line:#DFD9E2;
+  --serif: Didot, "Bodoni MT", "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --sans: "Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+*{box-sizing:border-box; margin:0}
+body{min-height:100vh; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15.5px; line-height:1.55;}
+.wrap{max-width:1040px; margin:0 auto; padding:0 22px}
+.nav{display:flex; align-items:center; gap:6px; padding:18px 0 14px; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.wordmark{font-family:var(--serif); font-style:italic; font-size:26px; margin-right:auto; cursor:pointer; border:none; background:none; color:var(--ink)}
+.wordmark span{color:var(--garnet)}
+.navbtn{border:none; background:none; font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); padding:8px 12px; border-radius:999px; cursor:pointer}
+.navbtn:hover{color:var(--ink)}
+.navbtn.on{background:var(--ink); color:#fff}
+button:focus-visible{outline:2px solid var(--garnet); outline-offset:2px}
+h1.display{font-family:var(--serif); font-weight:500; font-size:clamp(38px,6vw,64px); line-height:1.04; letter-spacing:-.01em}
+h2.display{font-family:var(--serif); font-weight:500; font-size:clamp(26px,3.6vw,36px); line-height:1.12; margin-bottom:10px}
+h3.display{font-family:var(--serif); font-weight:600; font-size:21px; margin-bottom:6px}
+.lede{color:var(--ink-soft); max-width:56ch}
+.hero{display:grid; grid-template-columns:1.15fr .85fr; gap:36px; align-items:center; padding:56px 0 40px}
+@media(max-width:820px){.hero{grid-template-columns:1fr; padding:36px 0}}
+.fan{position:relative; height:300px}
+.fan .fcard{position:absolute; left:50%; bottom:8px; width:86px; height:230px; border-radius:14px 14px 46px 46px; transform-origin:50% 96%; box-shadow:0 10px 24px rgba(36,30,40,.18); border:3px solid #fff}
+.btn{display:inline-block; border:none; cursor:pointer; font-family:var(--sans); font-size:15px; padding:12px 22px; border-radius:999px; background:var(--garnet); color:#fff}
+.btn:hover{background:var(--garnet-deep)}
+.btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--ink)}
+.btn.ghost:hover{background:var(--ink); color:#fff}
+.btn.small{padding:8px 16px; font-size:13.5px}
+.btn:disabled{opacity:.45; cursor:default}
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:26px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.eyebrow{font-family:var(--serif); font-style:italic; color:var(--garnet); font-size:17px; margin-bottom:4px}
+.methods{display:flex; gap:8px; margin:18px 0; flex-wrap:wrap}
+.method{border:1.5px solid var(--line); background:#fff; border-radius:12px; padding:10px 16px; cursor:pointer; font-size:14.5px; color:var(--ink-soft); font-family:var(--sans)}
+.method.on{border-color:var(--ink); color:var(--ink); font-weight:600}
+.opt{display:block; width:100%; text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:12px 16px; margin:8px 0; cursor:pointer; font-size:15px; color:var(--ink); font-family:var(--sans)}
+.opt:hover{border-color:var(--gold)}
+.opt.picked{border-color:var(--garnet); background:#FBF3F5}
+.qnum{font-family:var(--serif); font-style:italic; color:var(--gold); margin-bottom:2px}
+.swatches{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0}
+.sw{width:44px; height:44px; border-radius:10px; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.15); padding:0}
+.sw.big{width:56px; height:56px}
+.swbtn{cursor:pointer}
+.swbtn.on{outline:3px solid var(--ink)}
+.drapewrap{border-radius:20px; padding:44px 20px; display:flex; justify-content:center; transition:background .35s}
+.face{width:230px; height:230px; border-radius:50%; object-fit:cover; border:6px solid rgba(255,255,255,.85); box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.face.mini{width:84px; height:84px; border-width:3px}
+.faceph{width:230px; height:230px; border-radius:50%; background:#E8E2EA; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:13px; text-align:center; padding:20px}
+.tag{display:inline-block; font-size:12.5px; border:1px solid var(--line); border-radius:999px; padding:3px 11px; margin:0 6px 6px 0; color:var(--ink-soft); background:#fff}
+.divider{border:none; border-top:1px solid var(--line); margin:26px 0}
+.result-hero{border-radius:20px; padding:34px 30px; color:#fff}
+.bar{height:10px; border-radius:999px; background:var(--line); overflow:hidden; margin:6px 0 2px}
+.bar i{display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--garnet))}
+.celeb{font-family:var(--serif); font-size:18px}
+.uploader{border:2px dashed var(--line); border-radius:16px; padding:30px; text-align:center; background:#fff; cursor:pointer}
+.uploader:hover{border-color:var(--gold)}
+.note{font-size:13px; color:var(--ink-soft)}
+.two-col{columns:2; column-gap:26px}
+@media(max-width:700px){.two-col{columns:1}}
+.footer{padding:34px 0 44px; color:var(--ink-soft); font-size:13px; border-top:1px solid var(--line); margin-top:50px}
+.placer-canvas{touch-action:none; border-radius:16px; background:#241E28; max-width:100%; display:block; cursor:grab}
+.placer-canvas:active{cursor:grabbing}
+.zoomrow{display:flex; align-items:center; gap:12px; margin:12px 0}
+.zoomrow input[type=range]{flex:1; accent-color:var(--garnet)}
+.dialstage{position:relative; display:flex; justify-content:center; padding:8px 0 4px}
+.dial{width:min(460px,88vw); background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:18px; text-align:center; touch-action:pan-y; user-select:none}
+.dial svg{width:100%; height:auto; display:block}
+.dialarrow{position:absolute; top:50%; transform:translateY(-50%); z-index:2; width:44px; height:44px; border-radius:50%; padding:0; font-size:18px}
+.dialarrow.prev{left:0}
+.dialarrow.next{right:0}
+@media(max-width:560px){.dialarrow.prev{left:-8px}.dialarrow.next{right:-8px}}
+.dialpills{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:14px}
+.dialpills .method{padding:7px 13px; font-size:13px}
+.readout{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; margin:10px 0; font-size:14.5px}
+.readout b{font-family:var(--serif); font-style:italic; font-weight:500; color:var(--garnet)}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; scroll-behavior:auto !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav" id="nav"></nav>
+  <main id="main" style="padding-top:30px"></main>
+  <footer class="footer">Runs entirely on this device — no internet needed, nothing uploaded, photos never leave your browser. Color and Kibbe analysis are interpretive frameworks, not rules; the best guide is still your own mirror in daylight.</footer>
+</div>
+<script>
+/* ———————— DATA ———————— */
+const SEASONS={
+brightWinter:{name:"Bright Winter",family:"Winter",vec:{w:-0.5,v:0.1,c:1},traits:["cool-neutral undertone","high contrast","very clear, brilliant color"],blurb:"You are the season of neon signs on new snow. Your coloring holds extreme contrast and clarity, so color on you should be electric, icy, and unapologetic — anything dusty will look like a layer of fog over your face.",palette:["#101820","#FFFFFF","#E4002B","#FF3EB5","#0057B8","#00A3E0","#00B398","#6E2585","#FFD100","#DCE9F5"],avoid:["#C8B89E","#A69F88","#B69F82","#8E8268"],avoidNote:"muted, dusty earth tones drain your natural brilliance",celebs:["Courteney Cox","Krysten Ritter","Megan Fox"],tips:"Wear high-contrast combinations (black + white + one shock of color). Icy pastels beat creamy ones. Silver and white metals over yellow gold."},
+trueWinter:{name:"True Winter",family:"Winter",vec:{w:-1,v:0.3,c:0.6},traits:["fully cool undertone","high contrast","clear, deep color"],blurb:"The classic cool beauty. Blue undertones run through everything you wear best: true red, cobalt, emerald, pure white. You can carry black at full strength better than almost anyone.",palette:["#101820","#FFFFFF","#D50032","#0047BB","#009775","#C724B1","#5C068C","#DCE6F1","#63666A","#00B0B9"],avoid:["#D8712A","#C1A278","#B5892A","#A2A569"],avoidNote:"orange, camel, mustard and olive fight your cool undertone",celebs:["Anne Hathaway","Lucy Liu","Nina Dobrev"],tips:"Pure hues, never dusty. Jewel tones near the face. White should be optic, not cream. Silver, platinum and white gold are your metals."},
+darkWinter:{name:"Dark Winter",family:"Winter",vec:{w:-0.4,v:1,c:0.3},traits:["cool-neutral undertone","deep dominant","rich, slightly muted-to-clear"],blurb:"Midnight in a pine forest. Depth is your superpower — blackened jewel tones and espresso-dark neutrals frame your features while anything pale and powdery washes you out.",palette:["#1B1B1E","#5B2333","#01423A","#432C47","#A6192E","#00594C","#2C2A4A","#7A99AC","#F1F0EE","#846A8A"],avoid:["#FFE8A3","#FFCBA4","#B5E3D8","#F4B6C2"],avoidNote:"light pastels and peachy tones make you look faded",celebs:["Zoë Saldaña","Penélope Cruz","Kit Harington"],tips:"Build outfits from deep bases (black, pine, aubergine) and add one rich accent. Berry lips over nude. Dark denim over light wash."},
+brightSpring:{name:"Bright Spring",family:"Spring",vec:{w:0.5,v:0,c:1},traits:["warm-neutral undertone","medium-high contrast","hot, clear color"],blurb:"A tropical morning. You carry warmth and wattage together — coral, turquoise and poppy look alive on you, while anything greyed or dusty looks like it belongs to someone else.",palette:["#FF5C39","#00B2A9","#FFC72C","#FF3B30","#97D700","#003057","#FF7BAC","#00A9E0","#FFF8E7","#3E2B2E"],avoid:["#8E9AA6","#9E7E92","#A99A86","#5D6E82"],avoidNote:"greyed, smoky colors dim your natural brightness",celebs:["Emma Stone","Mindy Kaling","Richard Madden"],tips:"Pick the punchiest version of every color. Warm navy or chocolate instead of black. Gold jewelry with high polish."},
+trueSpring:{name:"True Spring",family:"Spring",vec:{w:1,v:0,c:0.6},traits:["fully warm undertone","medium contrast","clear, sunlit color"],blurb:"Golden hour, all day. Everything you wear best looks like it was warmed in sunlight — daffodil, coral, leaf green, turquoise. Cool icy shades read harsh against your golden warmth.",palette:["#FFC845","#FF8D6D","#74AA50","#2DCCD3","#FF6A39","#B86125","#FFF3D6","#00A5B5","#E03C31","#7A5C3E"],avoid:["#C724B1","#0047BB","#DCE6F1","#101820"],avoidNote:"icy cools and stark black overwhelm your warmth",celebs:["Blake Lively","Nicole Richie","Prince Harry"],tips:"Camel, warm ivory and golden brown are your neutrals. Coral blush over pink. Yellow gold, brass and amber in jewelry."},
+lightSpring:{name:"Light Spring",family:"Spring",vec:{w:0.6,v:-1,c:0.4},traits:["warm-neutral undertone","low contrast","light, fresh color"],blurb:"The first week of April. Your coloring is delicate and warm, so color should stay light, clean and slightly sun-kissed — peach over fuchsia, mint over forest, ivory over black.",palette:["#FFCBA4","#FFE8A3","#B5E3D8","#FFA38B","#C3D7EE","#F8B4C0","#D9B98F","#9BD3AE","#FFF6E9","#8A6F53"],avoid:["#1B1B1E","#5B2333","#6E1E3C","#333333"],avoidNote:"very dark, heavy colors overpower your delicacy",celebs:["Taylor Swift","Amanda Seyfried","Owen Wilson"],tips:"Head-to-toe light neutrals look expensive on you. Choose warm pastels over icy ones. Fine, light gold jewelry."},
+lightSummer:{name:"Light Summer",family:"Summer",vec:{w:-0.6,v:-1,c:-0.1},traits:["cool-neutral undertone","low contrast","light, airy color"],blurb:"Sea mist and hydrangeas. Your palette lives in soft, cool light: powder blue, rose, lavender. Deep saturated color creates a hard edge your features never asked for.",palette:["#AFC9E1","#F3B3C9","#C9B7D9","#BFE0D5","#D5DDE0","#DE7C9C","#8AA9C9","#F6F7F9","#A8A2C0","#6B7C93"],avoid:["#D8712A","#B7472A","#101820","#B5892A"],avoidNote:"hot oranges, black and mustard are far too heavy and warm",celebs:["Margot Robbie","Dakota Fanning","Naomi Watts"],tips:"Soft white and grey-blue replace stark black and white. Rose over red. Brushed silver and rose gold jewelry."},
+trueSummer:{name:"True Summer",family:"Summer",vec:{w:-1,v:0.1,c:-0.4},traits:["fully cool undertone","medium contrast","cool, softened color"],blurb:"Dusk over the ocean. Fully cool but never harsh — your best colors look like they've been seen through a fine haze: soft fuchsia, raspberry, slate blue, cocoa-rose.",palette:["#40587C","#B04A6E","#9DB8D2","#7A93AC","#B4649B","#7E5A7E","#C97B8B","#EDEEF2","#5D7B8A","#8C8A9E"],avoid:["#FF5C39","#FFC72C","#B86125","#97D700"],avoidNote:"hot, high-voltage warm shades clash with your coolness",celebs:["Emily Blunt","Barbra Streisand","Rachel McAdams"],tips:"Blue-based everything: blue-red, blue-pink, blue-grey. Watercolor combinations over hard contrast. Silver over gold."},
+softSummer:{name:"Soft Summer",family:"Summer",vec:{w:-0.3,v:0.2,c:-1},traits:["cool-neutral undertone","low-medium contrast","muted, misty color"],blurb:"Heather on a grey hillside. Your coloring blends rather than contrasts, so color should whisper: mauve, sage, dusty rose, slate. Anything neon or pure will wear you instead of the reverse.",palette:["#9E7E92","#C29BA3","#9CA88F","#5D6E82","#6E9E9C","#55415C","#8E9AA6","#B7A6B5","#EAE6E8","#4E5D6B"],avoid:["#E4002B","#FFD100","#00B398","#FF3EB5"],avoidNote:"pure, brilliant brights overwhelm your soft blending",celebs:["Jennifer Aniston","Sarah Jessica Parker","Ellen Pompeo"],tips:"Tonal outfits in greyed shades look effortlessly chic. Rose-brown lipstick over true red. Antiqued silver jewelry."},
+softAutumn:{name:"Soft Autumn",family:"Autumn",vec:{w:0.4,v:0.2,c:-1},traits:["warm-neutral undertone","low-medium contrast","muted, earthy color"],blurb:"Late-August fields. Warmth turned down to a hum — your best colors are sun-faded: sage, salmon, camel, muted teal. Clear jewel tones look borrowed on you; softened earth looks born on you.",palette:["#9C9A62","#D9977F","#C1A278","#7E7A46","#A99A86","#5E8E8B","#C57F63","#8A5A44","#F1E7D6","#6B4F3A"],avoid:["#0047BB","#C724B1","#FFFFFF","#101820"],avoidNote:"cool brights, optic white and black are too sharp",celebs:["Gigi Hadid","Drew Barrymore","Sofia Richie"],tips:"Mushroom, camel and olive are your black. Terracotta blush, brick-rose lips. Matte textures over shine, brushed gold jewelry."},
+trueAutumn:{name:"True Autumn",family:"Autumn",vec:{w:1,v:0.4,c:-0.2},traits:["fully warm undertone","medium contrast","rich, golden color"],blurb:"October at full blaze. Rust, olive, mustard and pumpkin were named for you. Your coloring is saturated with warmth, so cool pastels and icy shades look like static on the screen.",palette:["#B55A30","#77702B","#D9A21B","#D8712A","#44693D","#B08950","#B7472A","#5C3A21","#F3E4C8","#946B2D"],avoid:["#F3B3C9","#C9B7D9","#DCE6F1","#FFFFFF"],avoidNote:"icy pinks, lavenders and optic white fight your golden warmth",celebs:["Julia Roberts","Jessica Alba","Eddie Redmayne"],tips:"Tomato red is your red. Cream over white, chocolate over black. Hammered gold, copper, tortoiseshell and amber."},
+darkAutumn:{name:"Dark Autumn",family:"Autumn",vec:{w:0.5,v:1,c:-0.1},traits:["warm-neutral undertone","deep dominant","rich, smoldering color"],blurb:"Embers and espresso. You take autumn's warmth to its deepest register — burgundy, forest, burnt orange, dark teal. Light and powdery shades evaporate against your intensity.",palette:["#4B3621","#7C2529","#254337","#A84B2A","#1F4E5F","#8A6B2F","#5C4033","#B7472A","#EFE3CE","#3B2B35"],avoid:["#FFE8A3","#BFE0D5","#F3B3C9","#D5DDE0"],avoidNote:"pale pastels and misty shades make you look tired",celebs:["Natalie Portman","Oscar Isaac","Vanessa Hudgens"],tips:"Deep warm bases with one glowing accent (burnt orange, brick). Espresso liner over black. Antique gold and bronze."}
+};
+const KIBBE={
+D:{name:"Dramatic",balance:"Pure yang",short:"long, sharp, angular",blurb:"A long vertical line with sharp bones and taut flesh. You are architecture in motion — the body asks for one unbroken sweep of fabric with a blade-like edge.",lines:["Long, unbroken vertical lines","Sharp tailoring and defined shoulders","Sleek geometric silhouettes","Minimal, bold statement pieces"],fabrics:"Crisp, structured fabrics with weight: gabardine, heavy silk, leather, sculptural knits.",avoid:"Ruffles, dainty florals, waist-cinched full skirts, fussy detail — anything that chops the vertical line.",celebs:["Tilda Swinton","Zendaya","Cate Blanchett"]},
+SD:{name:"Soft Dramatic",balance:"Yang with a strong yin undercurrent",short:"long, angular, lush",blurb:"Bold bones softened by curve — old-Hollywood glamour lives here. Drama plus drape: strong shoulders and long lines carrying luxurious, flowing fabric over an hourglass.",lines:["Long lines with waist emphasis","Draped, flowing fabric over structure","Plunging necklines, dramatic sleeves","Oversized glam accessories"],fabrics:"Liquid and luxe: charmeuse, satin, velvet, jersey that clings and pours.",avoid:"Boxy minimalism, stiff menswear tailoring, small delicate prints and jewelry.",celebs:["Sofía Vergara","Ava Gardner","Christina Hendricks"]},
+FN:{name:"Flamboyant Natural",balance:"Soft yang",short:"long, broad, blunt",blurb:"A long frame with broad, blunt bones — effortless scale. You wear relaxed structure like it was invented for you: strong shoulders, easy drape, nothing precious.",lines:["Long, relaxed, unconstructed lines","Strong shoulders, oversized proportion","Layered, textural, easy volume","Bold but organic accessories"],fabrics:"Textured natural weight: raw silk, suede, chunky knits, brushed cotton, denim.",avoid:"Sharp severe tailoring, tiny fitted pieces, delicate ornate detail.",celebs:["Gisele Bündchen","Jennifer Lawrence","Princess Diana"]},
+SN:{name:"Soft Natural",balance:"Soft yang with yin curve",short:"blunt bones, soft flesh",blurb:"Blunt, natural bones with a gentle wave of curve over them. Relaxed shapes that acknowledge the waist are your home — soft structure, never stiff, never fussy.",lines:["Relaxed silhouettes with waist definition","Soft draping, gentle flow","Unforced, slightly bohemian ease","Organic textures and warm detail"],fabrics:"Soft with body: jersey, crepe, brushed knits, washed linen, soft denim.",avoid:"Severe sharp tailoring, rigid symmetry, heavy ornate embellishment.",celebs:["Scarlett Johansson","Jennifer Lopez","Selena Gomez"]},
+DC:{name:"Dramatic Classic",balance:"Balanced, leaning yang",short:"moderate, symmetrical, sharp-edged",blurb:"Evenness with an edge. Your features are balanced and symmetrical but finished with a tailored crispness — polished, precise, quietly powerful.",lines:["Clean tailored lines, moderate length","Symmetry with sharp finishing","Smooth, sleek silhouettes","Refined, geometric accessories"],fabrics:"Smooth and crisp: fine wool, silk shantung, sateen, quality suiting.",avoid:"Oversized slouch, heavy texture, romantic ruffles and clutter.",celebs:["Jackie Kennedy","Diane Kruger","Gemma Chan"]},
+SC:{name:"Soft Classic",balance:"Balanced, leaning yin",short:"moderate, symmetrical, rounded-edged",blurb:"Evenness with a glow. Balanced proportions finished with softness — you shine in refined, gently shaped clothing with a touch of romance, never extremes.",lines:["Smooth, softly tailored lines","Gentle waist emphasis","Rounded necklines, flowing skirts","Elegant, delicate-to-moderate detail"],fabrics:"Smooth with drape: crepe de chine, cashmere, silk blends, fine jersey.",avoid:"Harsh angular tailoring, oversized volume, rough heavy texture.",celebs:["Grace Kelly","Naomi Watts","Dakota Johnson"]},
+FG:{name:"Flamboyant Gamine",balance:"Yang-leaning mix of opposites",short:"petite frame, sharp angles",blurb:"A compact frame crackling with contrast — sharp meets cute. Broken lines, crisp edges and playful mixing are your signature; long flowing anything swallows you.",lines:["Broken, staccato lines and color blocking","Crisp fitted pieces, cropped lengths","Menswear details at petite scale","Bold graphic contrast"],fabrics:"Crisp with spring: taffeta, tweed, structured cotton, ponte, leather accents.",avoid:"Long unbroken gowns, soft billowy drape, wide flowing sleeves.",celebs:["Audrey Hepburn","Zoë Kravitz","Emma Watson"]},
+SG:{name:"Soft Gamine",balance:"Yin-leaning mix of opposites",short:"petite frame, rounded angles",blurb:"Doll-like contrast: small, sharp bones wrapped in soft rounded flesh. Fitted, animated, sweet-with-spice clothing at a small scale keeps your energy visible.",lines:["Fitted silhouettes with rounded detail","Cropped, waist-conscious shapes","Playful mixed prints at small scale","Rounded collars, puffed sleeves"],fabrics:"Soft but shaped: knits with stretch, velveteen, swiss dot, fine corduroy.",avoid:"Oversized drape, long heavy columns, severe minimalism.",celebs:["Winona Ryder","Bette Davis","Vanessa Hudgens"]},
+TR:{name:"Theatrical Romantic",balance:"Yin with a flash of yang",short:"delicate curve, sharp accents",blurb:"Romantic softness with a stiletto edge — delicate curves plus slightly sharp bones (cheekbones, jaw, hands). Ornate, waist-defined glamour at a delicate scale.",lines:["Hourglass emphasis with sharp accents","Draped, clinging fabric","Ornate, jeweled detail","Tapered lines, delicate scale"],fabrics:"Luxe and pliable: silk chiffon, charmeuse, lace, fine velvet, beading.",avoid:"Boxy oversized shapes, heavy rough texture, stark minimalism.",celebs:["Vivien Leigh","Salma Hayek","Mila Kunis"]},
+R:{name:"Romantic",balance:"Pure yin",short:"soft, rounded, lush",blurb:"Pure yin — rounded, luscious and gentle from bone to flesh. Fabric should honor the curve: draped, soft, waist-defined, with luminous rather than stiff surfaces.",lines:["Curve-following silhouettes","Defined waists, sweetheart necklines","Soft drape and gentle flou","Luminous, rounded detail"],fabrics:"Soft and flowing: silk jersey, chiffon, cashmere, velvet, angora.",avoid:"Sharp angular tailoring, stiff heavy fabric, oversized unstructured volume.",celebs:["Marilyn Monroe","Elizabeth Taylor","Madison Beer"]}
+};
+const KQ=[
+{cat:"Bone structure",q:"My overall vertical line (how long my frame appears, regardless of height) is…",o:["Very long and narrow — people assume I'm taller than I am","Long and broad — I have presence and scale","Moderate and even","Small and compact, slightly angular","Small, delicate and rounded"]},
+{cat:"Bone structure",q:"My shoulders are…",o:["Narrow and sharp","Broad and blunt","Even and symmetrical","Square-ish but small","Sloped and rounded"]},
+{cat:"Bone structure",q:"My arms and legs are…",o:["Long and narrow","Long and muscular or sturdy","In even proportion to my body","Short-ish relative to my body","Short and softly shaped"]},
+{cat:"Bone structure",q:"My hands and feet are…",o:["Long and narrow","Large and broad","Moderate","Small and slightly angular","Small, delicate and slightly wide"]},
+{cat:"Bone structure",q:"My jawline is…",o:["Sharp and prominent","Blunt and wide","Moderate and even","Delicate and tapered","Rounded and soft"]},
+{cat:"Bone structure",q:"My nose is…",o:["Long or sharp","Broad and blunt","Moderate and even","Delicate but slightly sharp","Rounded and soft"]},
+{cat:"Bone structure",q:"My cheekbones are…",o:["High and prominent","Wide and blunt","Moderate and even","Delicate and narrow","Rounded and full"]},
+{cat:"Body flesh",q:"The flesh on my body tends to be…",o:["Taut and dry, even with weight gain","Muscular and firm","Moderate and even","Soft with a hint of curve","Very soft and rounded"]},
+{cat:"Body flesh",q:"My bust and torso are…",o:["Flat and taut","Broad and wide","Moderate and even","Shapely at a small scale","Full and rounded"]},
+{cat:"Body flesh",q:"My waistline is…",o:["Straight and elongated","Straight-ish and slightly wide","Moderately defined","Defined but short","Very defined and soft"]},
+{cat:"Body flesh",q:"My hips are…",o:["Narrow and taut","Straight and slightly wide","Moderate and even","Shaped and slightly rounded","Very rounded and full"]},
+{cat:"Facial features",q:"My cheeks are…",o:["Taut or flat","Firm with wide planes","Moderate and even","Soft with some fullness","Very round and full"]},
+{cat:"Facial features",q:"My lips are…",o:["Straight and narrow","Broad but firm","Moderate and even","Slightly full and rounded","Very full and lush"]},
+{cat:"Facial features",q:"My eyes are…",o:["Long and narrow","Wide-set and firm","Evenly spaced and moderate","Rounded and slightly close-set","Very large and round"]},
+{cat:"Fit check",q:"A sharply tailored blazer with crisp shoulders looks on me…",o:["Striking and right — sharp structure suits me","A bit stiff — I need it relaxed or unstructured","Perfectly fine — classic tailoring always works on me","Cute but costume-y — like I borrowed it","Overwhelming — it wears me and hides my shape"]},
+{cat:"Fit check",q:"Soft, flowy, draped fabric (a silk slip dress, a fluid wrap) looks on me…",o:["Droopy and unfinished — I lose all my edge","Nice as an accent, but too precious head-to-toe","Lovely in moderation","Sweet, but it swallows me unless it's small-scale","Absolutely right — it follows my curves beautifully"]},
+{cat:"Fit check",q:"Oversized, slouchy clothes (boyfriend blazer, big knits) look on me…",o:["Fine, as long as the lines stay long and clean","Effortlessly right — honestly my best look","A little sloppy — I need even proportions","Like I'm playing dress-up in someone else's closet","Shapeless — I disappear without my waist shown"]}
+];
+const HEIGHTS=["Under 5'2\" (under 157 cm)","5'2\" to 5'4\" (157–163 cm)","5'5\" to 5'7\" (164–171 cm)","5'8\" or taller (172 cm and up)"];
+const CQ=[
+{q:"The veins on the inside of my wrist look…",o:[{t:"Mostly green",fx:{w:1}},{t:"Mostly blue or purple",fx:{w:-1}},{t:"A mix of both / hard to tell",fx:{w:0}}]},
+{q:"Against my bare face, the metal that flatters me most is…",o:[{t:"Yellow gold",fx:{w:1}},{t:"Silver or platinum",fx:{w:-1}},{t:"Both look fine",fx:{w:0}}]},
+{q:"In the sun, my skin…",o:[{t:"Tans easily, rarely burns",fx:{w:0.7,v:0.3}},{t:"Burns first, tans little",fx:{w:-0.7,v:-0.3}},{t:"Burns then tans",fx:{w:0}}]},
+{q:"My eyes are best described as…",o:[{t:"Bright and jewel-like — they sparkle",fx:{c:1}},{t:"Soft and muted — they blend",fx:{c:-1}},{t:"Somewhere in between",fx:{c:0}}]},
+{q:"My natural hair color is…",o:[{t:"Light (blonde, light brown, light red)",fx:{v:-1}},{t:"Medium (brown, auburn)",fx:{v:0.2}},{t:"Deep (dark brown, black)",fx:{v:1}}]},
+{q:"The contrast between my hair, skin and eyes is…",o:[{t:"High — strong difference between them",fx:{v:0.5,c:0.5}},{t:"Low — they blend together",fx:{v:-0.4,c:-0.5}},{t:"Medium",fx:{c:0.1}}]},
+{q:"When I wear pure black near my face…",o:[{t:"I look sharp and striking",fx:{v:0.6,c:0.5}},{t:"I look tired or washed out",fx:{v:-0.5,c:-0.3}},{t:"It's fine but not my best",fx:{}}]}
+];
+const DRAPES=[
+{label:"Warm vs cool metals",pair:[["#C9A24B","Gold"],["#C0C6CE","Silver"]],look:"Which makes your skin look even and lit from within? Shadows and redness deepen under the wrong one."},
+{label:"Warm red vs cool red",pair:[["#B7472A","Tomato"],["#B04A6E","Raspberry"]],look:"The right red makes your lips and cheeks look naturally rosier; the wrong one makes skin look sallow or ashy."},
+{label:"Cream vs pure white",pair:[["#F3E4C8","Cream"],["#FFFFFF","Optic white"]],look:"One will blend and glow, the other will either sharpen you (cool) or turn you grey."},
+{label:"Salmon vs cool pink",pair:[["#FF8D6D","Salmon"],["#F3B3C9","Rose pink"]],look:"Watch the under-eye area: the flattering pink erases shadows, the other one deepens them."},
+{label:"Bright vs muted",pair:[["#00A3E0","Clear azure"],["#7A93AC","Dusty blue"]],look:"If the bright swatch wears you (all you see is the color), you're likely soft. If it wakes your face up, you're bright."},
+{label:"Light vs deep",pair:[["#D5DDE0","Mist"],["#1B1B1E","Ink"]],look:"Depth suits you if black frames your features instead of floating them; lightness suits you if ink looks like a hole in the photo."}
+];
+const ESSENCES=[
+{name:"Dramatic",note:"Sharp, elongated, intense. Add via strong shoulders, monochrome, severe lines."},
+{name:"Natural",note:"Relaxed, textural, unforced. Add via easy drape, raw texture, undone hair."},
+{name:"Classic",note:"Balanced, timeless, polished. Add via symmetry, smooth fabric, refined tailoring."},
+{name:"Gamine",note:"Playful, crisp, youthful contrast. Add via cropped lengths, mixing, graphic prints."},
+{name:"Romantic",note:"Soft, lush, sensual. Add via drape, waist emphasis, luminous fabric."},
+{name:"Ingenue",note:"Sweet, delicate, fresh. Add via small florals, ribbon, rounded collars."},
+{name:"Ethereal",note:"Otherworldly, floating, luminous. Add via sheer layers, iridescence, flowing hems."}
+];
+
+/* ———————— STATE & HELPERS ———————— */
+const S={page:"home",ctab:"photo",gtab:"seasons",seasonId:null,kibbeId:null,kibbeNote:null,kh:null,faceUrl:null,drape:"#B04A6E",cq:{},kq:{},dialIndex:0};
+let srcImg=null, view={x:0,y:0,scale:1}, dragging=null;
+const OV={cx:180,cy:210,rx:120,ry:155,W:360,H:440};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function swatches(colors,big){return '<div class="swatches">'+colors.map(c=>`<div class="sw${big?' big':''}" style="background:${c}" title="${c}"></div>`).join('')+'</div>';}
+function tags(arr){return arr.map(t=>`<span class="tag">${t}</span>`).join('');}
+
+function go(p){S.page=p;render();window.scrollTo(0,0);}
+function setCtab(t){S.ctab=t;render();}
+function setGtab(t){S.gtab=t;render();}
+function pickSeason(id){S.seasonId=id;render();}
+function claimSeason(id){S.seasonId=id;go("dossier");}
+function claimKibbe(id){S.kibbeId=id;go("dossier");}
+function setDrape(c){S.drape=c;const d=$("drapebox");if(d){d.style.background=c;markDrapeSel(c);}else render();}
+function markDrapeSel(c){document.querySelectorAll(".drapesw").forEach(b=>b.classList.toggle("on",b.dataset.c===c));}
+function answerCQ(qi,oi){S.cq[qi]=oi;render();}
+function answerKQ(qi,oi){S.kq[qi]=oi;render();}
+function answerKH(i){S.kh=i;render();}
+
+/* ———————— FACE PLACER ———————— */
+function onFile(e){
+  const f=e.target.files&&e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{const im=new Image(); im.onload=()=>{srcImg=im; fitImage(); S.faceUrl=null; S.ctab="photo"; render();}; im.src=r.result;};
+  r.readAsDataURL(f);
+}
+function fitImage(){
+  const s=Math.max(OV.W/srcImg.width, OV.H/srcImg.height)*1.05;
+  view={scale:s, x:(OV.W-srcImg.width*s)/2, y:(OV.H-srcImg.height*s)/2};
+}
+function setupPlacer(){
+  const cv=$("placer"); if(!cv)return;
+  drawPlacer();
+  cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId); dragging={x:e.clientX,y:e.clientY};};
+  cv.onpointermove=e=>{if(!dragging)return; const k=cv.width/cv.getBoundingClientRect().width;
+    view.x+=(e.clientX-dragging.x)*k; view.y+=(e.clientY-dragging.y)*k; dragging={x:e.clientX,y:e.clientY}; drawPlacer();};
+  cv.onpointerup=cv.onpointercancel=()=>{dragging=null;};
+  cv.onwheel=e=>{e.preventDefault(); zoomAt(Math.exp(-e.deltaY*0.0015));};
+  const z=$("zoom"); if(z){z.oninput=()=>{const target=parseFloat(z.value); zoomTo(target);};}
+}
+function zoomAt(f){const cx=OV.cx,cy=OV.cy; view.x=cx-(cx-view.x)*f; view.y=cy-(cy-view.y)*f; view.scale*=f; drawPlacer(); const z=$("zoom"); if(z)z.value=view.scale;}
+function zoomTo(t){zoomAt(t/view.scale);}
+function drawPlacer(){
+  const cv=$("placer"); if(!cv||!srcImg)return;
+  const x=cv.getContext("2d");
+  x.clearRect(0,0,OV.W,OV.H);
+  x.drawImage(srcImg,view.x,view.y,srcImg.width*view.scale,srcImg.height*view.scale);
+  x.save(); x.beginPath(); x.rect(0,0,OV.W,OV.H); x.ellipse(OV.cx,OV.cy,OV.rx,OV.ry,0,0,Math.PI*2,true);
+  x.fillStyle="rgba(36,30,40,.55)"; x.fill("evenodd"); x.restore();
+  x.save(); x.setLineDash([7,7]); x.strokeStyle="rgba(255,255,255,.9)"; x.lineWidth=2.5;
+  x.beginPath(); x.ellipse(OV.cx,OV.cy,OV.rx,OV.ry,0,0,Math.PI*2); x.stroke(); x.restore();
+}
+function setFace(){
+  if(!srcImg)return;
+  const R=152, out=document.createElement("canvas"); out.width=out.height=300;
+  const o=out.getContext("2d"), k=150/R;
+  o.beginPath(); o.arc(150,150,150,0,Math.PI*2); o.clip();
+  o.translate(150-(OV.cx)*k,150-(OV.cy-8)*k); o.scale(k,k);
+  o.drawImage(srcImg,view.x,view.y,srcImg.width*view.scale,srcImg.height*view.scale);
+  S.faceUrl=out.toDataURL("image/jpeg",0.9);
+  render();
+}
+
+/* ———————— (analysis removed — the sun dials, draping and quiz are the ways in) ———————— */
+function clamp(v){return Math.max(-1,Math.min(1,v));}
+
+/* ———————— SUN DIALS ———————— */
+function dialSVG(id){
+  const s=SEASONS[id], n=s.palette.length, cx=175, cy=175, r1=116, r2=172, gap=2.5;
+  let rays="";
+  for(let i=0;i<n;i++){
+    const a0=((i*360/n)-90+gap)*Math.PI/180, a1=(((i+1)*360/n)-90-gap)*Math.PI/180;
+    const P=(r,a)=>`${(cx+r*Math.cos(a)).toFixed(1)} ${(cy+r*Math.sin(a)).toFixed(1)}`;
+    rays+=`<path d="M ${P(r1,a0)} L ${P(r2,a0)} A ${r2} ${r2} 0 0 1 ${P(r2,a1)} L ${P(r1,a1)} A ${r1} ${r1} 0 0 0 ${P(r1,a0)} Z" fill="${s.palette[i]}"/>`;
+  }
+  const face=S.faceUrl
+    ?`<clipPath id="fc-${id}"><circle cx="${cx}" cy="${cy}" r="108"/></clipPath><image href="${S.faceUrl}" x="${cx-108}" y="${cy-108}" width="216" height="216" clip-path="url(#fc-${id})" preserveAspectRatio="xMidYMid slice"/>`
+    :`<circle cx="${cx}" cy="${cy}" r="108" fill="#E8E2EA"/><text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#5C5262" font-family="sans-serif">Add a photo to</text><text x="${cx}" y="${cy+16}" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#5C5262" font-family="sans-serif">see yourself here</text>`;
+  return `<svg viewBox="0 0 350 350" role="img" aria-label="${s.name} colors around your face">${rays}<circle cx="${cx}" cy="${cy}" r="112" fill="#fff"/>${face}</svg>`;
+}
+function dialInner(id){
+  const x=SEASONS[id];
+  return `<h3 class="display" style="margin-bottom:2px">${x.name}</h3>
+    <p class="note" style="margin-bottom:8px">${x.traits.join(" · ")}</p>
+    ${dialSVG(id)}
+    <div style="margin-top:10px"><button class="btn ghost small" onclick="claimSeason('${id}')">This is my season</button></div>`;
+}
+function dialStep(d){
+  const n=Object.keys(SEASONS).length;
+  S.dialIndex=(S.dialIndex+d+n)%n; updateDial();
+}
+function dialJump(i){S.dialIndex=i; updateDial();}
+function updateDial(){
+  const box=$("dialbox"); if(!box)return;
+  box.innerHTML=dialInner(Object.keys(SEASONS)[S.dialIndex]);
+  document.querySelectorAll(".dialpill").forEach((b,i)=>b.classList.toggle("on",i===S.dialIndex));
+}
+function setupDials(){
+  const box=$("dialbox"); if(!box)return;
+  let sx=null;
+  box.onpointerdown=e=>{sx=e.clientX;};
+  box.onpointerup=e=>{if(sx!==null){const dx=e.clientX-sx; if(Math.abs(dx)>45)dialStep(dx<0?1:-1); sx=null;}};
+  document.onkeydown=e=>{
+    if(S.page!=="color"||S.ctab!=="dials")return;
+    if(e.key==="ArrowRight")dialStep(1);
+    if(e.key==="ArrowLeft")dialStep(-1);
+  };
+}
+
+/* ———————— PAGE RENDERERS ———————— */
+function seasonCard(id,claim){
+  const s=SEASONS[id];
+  return `<div class="panel" style="padding:20px"><h3 class="display">${s.name}</h3>
+  <div style="margin-bottom:6px">${tags(s.traits)}</div>${swatches(s.palette.slice(0,8))}
+  <p class="note" style="margin-bottom:10px">${s.blurb}</p>
+  ${claim?`<button class="btn ghost small" onclick="claimSeason('${id}')">This is my season</button>`:""}</div>`;
+}
+function photoBar(actionLabel){
+  return S.faceUrl||srcImg
+    ?`<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+       ${S.faceUrl?`<img src="${S.faceUrl}" class="face mini" alt="Your placed face">`:""}
+       <button class="btn ghost small" onclick="document.getElementById('file').click()">Change photo</button></div>`
+    :`<div class="uploader" onclick="document.getElementById('file').click()" role="button" tabindex="0"
+        onkeydown="if(event.key==='Enter')document.getElementById('file').click()">
+       <h3 class="display">Add a photo of your face</h3>
+       <p class="note">Natural daylight, no makeup or filters, hair pulled back if possible. The photo never leaves this device.</p>
+       <div style="margin-top:12px"><span class="btn small">Choose photo</span></div></div>`;
+}
+function renderColor(){
+  const t=S.ctab, s=S.seasonId?SEASONS[S.seasonId]:null;
+  let body="";
+  if(t==="photo"){
+    body = srcImg ? `
+      <div class="grid2" style="align-items:start">
+        <div>
+          <canvas id="placer" class="placer-canvas" width="360" height="440" aria-label="Drag to place your face in the oval"></canvas>
+          <div class="zoomrow"><span class="note">Zoom</span>
+            <input id="zoom" type="range" min="0.2" max="6" step="0.01" value="${view.scale}"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="setFace()">Set my face</button>
+            <button class="btn ghost small" onclick="document.getElementById('file').click()">Different photo</button>
+          </div>
+          <p class="note" style="margin-top:10px">Drag to move, scroll or slide to zoom, until your face fills the oval — chin near the bottom, forehead near the top.</p>
+        </div>
+        <div>${
+          S.faceUrl?`<div class="panel"><p class="eyebrow">Face set</p><h3 class="display">Now see yourself in color</h3>
+            <img src="${S.faceUrl}" class="face" style="margin:6px auto 14px;display:block" alt="Your placed face">
+            <p class="note" style="margin-bottom:12px">Your face now sits at the center of every sun dial and inside the draping mirror. Trust your eyes — the right palette evens your skin and brightens your eyes.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn small" onclick="setCtab('dials')">Open the sun dials</button>
+              <button class="btn ghost small" onclick="setCtab('drape')">Start draping</button>
+            </div></div>`
+          :`<div class="panel"><h3 class="display">Why the oval</h3>
+            <p style="margin-bottom:8px">A well-placed face makes every tool downstream work better: it becomes the center of each sun dial and the portrait inside the draping mirror, so you're always judging color against your actual skin, eyes and hair.</p>
+            <p class="note">Best photo: natural daylight, facing the light, no filters, minimal makeup. Nothing is uploaded — the photo never leaves this device.</p></div>`
+        }</div></div>`
+      : photoBar();
+  }
+  if(t==="dials"){
+    const ids=Object.keys(SEASONS);
+    body=`${srcImg&&!S.faceUrl?`<p class="note" style="margin-bottom:10px">Tip: set your face in the Photo tab first and it will appear at the center of every dial.</p>`:""}
+    ${!srcImg?photoBar():""}
+    <div class="dialstage">
+      <button class="btn ghost dialarrow prev" onclick="dialStep(-1)" aria-label="Previous season">←</button>
+      <div class="dial" id="dialbox">${dialInner(ids[S.dialIndex])}</div>
+      <button class="btn ghost dialarrow next" onclick="dialStep(1)" aria-label="Next season">→</button>
+    </div>
+    <div class="dialpills">${ids.map((id,i)=>
+      `<button class="method dialpill${i===S.dialIndex?" on":""}" onclick="dialJump(${i})">${SEASONS[id].name}</button>`).join("")}</div>
+    <p class="note" style="text-align:center;margin-top:10px">Arrow, swipe, or tap a season name. The right palette makes your skin look even and your eyes brighter — the wrong one grabs the attention for itself.</p>`;
+  }
+  if(t==="drape"){
+    body=`<div class="grid2">
+      <div>
+        <div class="drapewrap" id="drapebox" style="background:${S.drape}">
+          ${S.faceUrl?`<img src="${S.faceUrl}" class="face" alt="Your face on a drape color">`
+            :`<div class="faceph">Add a photo in the Photo tab to drape it</div>`}
+        </div>
+        <div class="swatches" style="margin-top:14px">
+          ${Object.values(SEASONS).flatMap(x=>[x.palette[2],x.palette[3]]).slice(0,24).map(c=>
+            `<button class="sw swbtn drapesw${S.drape===c?" on":""}" data-c="${c}" style="background:${c}" onclick="setDrape('${c}')" aria-label="Drape ${c}"></button>`).join("")}
+        </div>
+      </div>
+      <div>
+        <h3 class="display">How to drape</h3>
+        <p class="note" style="margin-bottom:12px">Work through each pair. Tap both colors and watch your face, not the color: skin evenness, under-eye shadows, how bright your eyes look.</p>
+        ${DRAPES.map(d=>`<div style="margin-bottom:14px"><strong style="font-size:14.5px">${d.label}</strong>
+          <div style="display:flex;gap:8px;margin:6px 0">
+          ${d.pair.map(([c,n])=>`<button class="btn ghost small drapesw${S.drape===c?" on":""}" data-c="${c}" style="display:flex;align-items:center;gap:8px;border-color:var(--line)" onclick="setDrape('${c}')">
+            <span class="sw" style="background:${c};width:22px;height:22px;border-radius:6px"></span>${n}</button>`).join("")}
+          </div><p class="note">${d.look}</p></div>`).join("")}
+        <hr class="divider">
+        <p class="note">Warm winners point to Spring/Autumn; cool to Summer/Winter. Bright + deep leans Winter, bright + warm leans Spring, muted + warm leans Autumn, muted + cool leans Summer.</p>
+      </div></div>
+      <div style="margin-top:22px"><h3 class="display">Set your season</h3>
+        <div class="swatches">${Object.entries(SEASONS).map(([id,x])=>
+          `<button class="method${S.seasonId===id?" on":""}" onclick="pickSeason('${id}')">${x.name}</button>`).join("")}</div></div>`;
+  }
+  if(t==="quiz"){
+    const done=Object.keys(S.cq).length===CQ.length;
+    body=`<div style="max-width:640px">
+      ${CQ.map((q,qi)=>`<div style="margin-bottom:18px"><p class="qnum">${qi+1} of ${CQ.length}</p><strong>${q.q}</strong>
+        ${q.o.map((o,oi)=>`<button class="opt${S.cq[qi]===oi?" picked":""}" onclick="answerCQ(${qi},${oi})">${o.t}</button>`).join("")}</div>`).join("")}
+      <button class="btn" ${done?"":"disabled"} onclick="quizSeason()">Reveal my season</button></div>`;
+  }
+  const showResult = s && (t==="quiz"||t==="drape");
+  return `<p class="eyebrow">Step one</p><h2 class="display">Find your color season</h2>
+    <p class="lede">Your season describes the undertone, depth and clarity your skin harmonizes with. Set your photo once, then judge with your own eyes: spin through the sun dials, work the draping pairs, or take the no-photo quiz.</p>
+    <div class="methods">${[["photo","Your photo"],["dials","Sun dials"],["drape","Draping"],["quiz","No-photo quiz"]].map(([k,l])=>
+      `<button class="method${t===k?" on":""}" onclick="setCtab('${k}')">${l}</button>`).join("")}</div>
+    ${body}
+    ${showResult?`<div style="margin-top:22px"><hr class="divider">${seasonCard(S.seasonId,false)}</div>`:""}`;
+}
+function quizSeason(){
+  const v={w:0,v:0,c:0};
+  Object.entries(S.cq).forEach(([qi,oi])=>{const fx=CQ[qi].o[oi].fx; v.w+=fx.w||0; v.v+=fx.v||0; v.c+=fx.c||0;});
+  const norm={w:clamp(v.w/2),v:clamp(v.v/1.6),c:clamp(v.c/1.6)};
+  let best=null,bd=1e9;
+  for(const [id,x] of Object.entries(SEASONS)){const d=(x.vec.w-norm.w)**2+(x.vec.v-norm.v)**2+(x.vec.c-norm.c)**2; if(d<bd){bd=d;best=id;}}
+  S.seasonId=best; render();
+}
+function kibbeFromCounts(c){
+  const total=c.a+c.b+c.c+c.d+c.e, yang=c.a+c.b, yin=c.d+c.e, pct=n=>n/total;
+  const max=Math.max(c.a,c.b,c.c,c.d,c.e);
+  if(c.c===max&&pct(c.c)>=0.32)return yang>=yin?"DC":"SC";
+  if(c.a===max)return pct(c.e+c.d)>=0.28?"SD":"D";
+  if(c.b===max)return pct(c.d+c.e)>=0.28?"SN":"FN";
+  if(c.d===max)return yang>=yin-c.d?(c.e>c.a+c.b?"SG":"FG"):"SG";
+  if(c.e===max)return pct(c.a+c.b)>=0.22?"TR":"R";
+  return yang>yin?"DC":"SC";
+}
+function heightGate(base){
+  // Kibbe's height rules: petite-frame types (Gamines, Romantic, TR) cap around 5'5";
+  // above that, yin expresses through vertical line. Very petite frames rarely carry pure long-line types.
+  if(S.kh===3) return {R:"SD",TR:"SD",SG:"SN",FG:"FN",SC:"SN",DC:"D"}[base]||base;      // 5'8"+
+  if(S.kh===2) return {R:"SD",TR:"SD",SG:"SN",FG:"FN"}[base]||base;                     // 5'5"–5'7"
+  if(S.kh===0) return {D:"FG",SD:"TR",FN:"SN"}[base]||base;                             // under 5'2"
+  return base;                                                                          // 5'2"–5'4"
+}
+function revealKibbe(){
+  const c={a:0,b:0,c:0,d:0,e:0};
+  Object.values(S.kq).forEach(i=>c["abcde"[i]]++);
+  const base=kibbeFromCounts(c);
+  const final=heightGate(base);
+  S.kibbeNote = final!==base
+    ? `Your feature answers alone lean ${KIBBE[base].name} — but in the Kibbe system, height is part of your line. At ${HEIGHTS[S.kh].split(" (")[0]}, that same yin–yang mix expresses as ${KIBBE[final].name}.`
+    : null;
+  S.kibbeId=final; render();
+}
+function renderKibbe(){
+  const answered=Object.keys(S.kq).length+(S.kh!==null?1:0), totalQ=KQ.length+1;
+  const done=S.kh!==null&&Object.keys(S.kq).length===KQ.length;
+  const n=Math.max(1,Object.keys(S.kq).length);
+  const c={a:0,b:0,c:0,d:0,e:0}; Object.values(S.kq).forEach(i=>c["abcde"[i]]++);
+  const yang=(c.a+c.b)/n, yin=(c.d+c.e)/n, k=S.kibbeId?KIBBE[S.kibbeId]:null;
+  let lastCat=null;
+  return `<p class="eyebrow">Step two</p><h2 class="display">Find your silhouette type</h2>
+  <p class="lede">Kibbe body typing reads your bone structure, flesh and facial features on a spectrum from yang (long, sharp, angular) to yin (soft, rounded, delicate) — then tells you which lines, fabrics and silhouettes echo what's already there. Height counts too: petite-frame types only exist below about 5'5", and length itself is yang. Answer honestly about your skeleton, not your weight; a mirror and a snug outfit help.</p>
+  <div class="grid2" style="margin-top:18px;align-items:start">
+    <div>
+      <h3 class="display">Height</h3>
+      <div style="margin-bottom:18px">
+        <p class="qnum">1 of ${totalQ}</p><strong>How tall am I?</strong>
+        ${HEIGHTS.map((o,i)=>`<button class="opt${S.kh===i?" picked":""}" onclick="answerKH(${i})">${o}</button>`).join("")}
+        <p class="note" style="margin-top:4px">Height is a hard line in this system: below about 5'5" the petite types (Gamine, Romantic) open up; above it, the same softness expresses through vertical line instead.</p>
+      </div>
+      ${KQ.map((q,qi)=>{const show=q.cat!==lastCat; lastCat=q.cat;
+        return `<div style="margin-bottom:18px">${show?`<h3 class="display" style="margin-top:${qi?18:0}px">${q.cat}</h3>`:""}
+        <p class="qnum">${qi+2} of ${totalQ}</p><strong>${q.q}</strong>
+        ${q.o.map((o,oi)=>`<button class="opt${S.kq[qi]===oi?" picked":""}" onclick="answerKQ(${qi},${oi})">${o}</button>`).join("")}</div>`;}).join("")}
+      <button class="btn" ${done?"":"disabled"} onclick="revealKibbe()">Reveal my type</button>
+    </div>
+    <div style="position:sticky;top:14px">
+      <div class="panel"><h3 class="display">Your yin–yang balance</h3>
+        <p class="note">Yang — length, sharpness, blunt strength</p><div class="bar"><i style="width:${yang*100}%"></i></div>
+        <p class="note" style="margin-top:10px">Yin — softness, roundness, delicacy</p><div class="bar"><i style="width:${yin*100}%"></i></div>
+        <p class="note" style="margin-top:12px">${answered} of ${totalQ} answered</p></div>
+      ${k?`<div class="panel" style="margin-top:14px"><p class="eyebrow">Your type</p><h3 class="display">${k.name}</h3>
+        ${tags([k.balance,k.short])}
+        ${S.kibbeNote?`<p class="note" style="margin:8px 0;color:var(--garnet)">${S.kibbeNote}</p>`:""}
+        <p style="margin:10px 0">${k.blurb}</p>
+        <strong style="font-size:14px">Your lines</strong>
+        <ul style="padding:4px 0 8px 18px">${k.lines.map(l=>`<li style="margin-bottom:2px">${l}</li>`).join("")}</ul>
+        <p style="margin-bottom:6px"><strong style="font-size:14px">Fabrics · </strong>${k.fabrics}</p>
+        <p class="note"><strong>Skip: </strong>${k.avoid}</p></div>`:""}
+    </div></div>`;
+}
+function renderDossier(){
+  const s=S.seasonId?SEASONS[S.seasonId]:null, k=S.kibbeId?KIBBE[S.kibbeId]:null;
+  if(!s&&!k)return `<div style="text-align:center;padding:60px 0">
+    <h2 class="display">Your profile is waiting to be written</h2>
+    <p class="lede" style="margin:10px auto 20px">Find your color season and silhouette type first — then this page becomes your personal style dossier.</p>
+    <button class="btn" onclick="go('color')">Start with color</button></div>`;
+  return `<div class="result-hero" style="background:${s?`linear-gradient(120deg, ${s.palette[0]}, ${s.palette[2]||s.palette[1]})`:"var(--ink)"}">
+    <p style="font-family:var(--serif);font-style:italic;font-size:19px;opacity:.9">Your style dossier</p>
+    <h1 class="display" style="font-size:clamp(30px,5vw,48px)">${s?s.name:"Season pending"}${k?" · "+k.name:""}</h1>
+    ${S.faceUrl?`<img src="${S.faceUrl}" class="face mini" style="margin-top:10px" alt="You">`:""}</div>
+  <div class="grid2" style="margin-top:18px">
+    ${s?`<div class="panel"><p class="eyebrow">Your colors</p><h3 class="display">${s.name}</h3>
+      <p style="margin-bottom:8px">${s.blurb}</p>${swatches(s.palette,true)}
+      <p style="margin:8px 0 4px"><strong style="font-size:14px">Handle with care</strong></p>${swatches(s.avoid)}
+      <p class="note">${s.avoidNote}.</p><p style="margin-top:8px">${s.tips}</p></div>`:""}
+    ${k?`<div class="panel"><p class="eyebrow">Your lines</p><h3 class="display">${k.name}</h3>
+      <p style="margin-bottom:8px">${k.blurb}</p>
+      <ul style="padding:0 0 8px 18px">${k.lines.map(l=>`<li style="margin-bottom:3px">${l}</li>`).join("")}</ul>
+      <p style="margin-bottom:6px"><strong style="font-size:14px">Fabrics · </strong>${k.fabrics}</p>
+      <p class="note"><strong>Skip: </strong>${k.avoid}</p></div>`:""}
+  </div>
+  ${s&&k?`<div class="panel" style="margin-top:18px"><p class="eyebrow">Putting it together</p>
+    <h3 class="display">Your season paints, your type sculpts</h3>
+    <p>Shop silhouettes with ${k.name.toLowerCase()} lines — ${k.short} — then choose them only in your ${s.name} palette. When both align, clothes stop competing with you: the color makes your skin glow while the cut echoes your natural geometry. A quick test in the fitting room: does the color wake up your face, and does the shape follow your body's own lines without fighting them?</p></div>`:""}
+  <div class="panel" style="margin-top:18px"><p class="eyebrow">Your celebrity mirrors</p>
+    <h3 class="display">Style muses to study</h3>
+    ${s?`<p class="celeb" style="margin-bottom:6px">Season kin — ${s.celebs.join(", ")}</p>`:""}
+    ${k?`<p class="celeb">Silhouette kin — ${k.celebs.join(", ")}</p>`:""}
+    <p class="note" style="margin-top:8px">Widely cited examples from the color and Kibbe communities — use their red-carpet hits and misses as a study guide, not a rulebook.</p></div>`;
+}
+function renderLibrary(){
+  const t=S.gtab;
+  return `<p class="eyebrow">The library</p><h2 class="display">Every season, every type</h2>
+  <p class="lede">Browse the full system — or claim a season or type directly if you already know yours.</p>
+  <div class="methods">${[["seasons","12 seasons"],["kibbe","10 Kibbe types"],["essence","7 essences"]].map(([kk,l])=>
+    `<button class="method${t===kk?" on":""}" onclick="setGtab('${kk}')">${l}</button>`).join("")}</div>
+  ${t==="seasons"?`<div class="grid2">${Object.keys(SEASONS).map(id=>seasonCard(id,true)).join("")}</div>`:""}
+  ${t==="kibbe"?`<div class="grid2">${Object.entries(KIBBE).map(([id,k])=>
+    `<div class="panel" style="padding:20px"><h3 class="display">${k.name}</h3>${tags([k.balance,k.short])}
+     <p class="note" style="margin:8px 0">${k.blurb}</p>
+     <p class="note" style="margin-bottom:10px"><strong>Muses: </strong>${k.celebs.join(", ")}</p>
+     <button class="btn ghost small" onclick="claimKibbe('${id}')">This is my type</button></div>`).join("")}</div>`:""}
+  ${t==="essence"?`<div class="panel"><p style="margin-bottom:14px;max-width:62ch">Essence is the flavor on top of your structure — the impression your face and energy give beyond bone and color. Most people carry a blend of two or three. Borrow from any essence in small doses to make an outfit feel more like you.</p>
+    <div class="two-col">${ESSENCES.map(e=>`<p style="break-inside:avoid;margin-bottom:12px"><span style="font-family:var(--serif);font-size:19px">${e.name}. </span>${e.note}</p>`).join("")}</div></div>`:""}`;
+}
+function renderHome(){
+  const fans=Object.values(SEASONS).map(s=>s.palette);
+  return `<div class="hero"><div>
+    <h1 class="display">Dress like you know exactly who you are.</h1>
+    <p class="lede" style="margin:16px 0 24px">Your pocket stylist reads your coloring against the 12 seasons, maps your bone structure through the Kibbe system, and hands you the palette, lines, fabrics and celebrity mirrors that make everything you put on look intentional. Everything runs on this device — take it anywhere.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="go('color')">Find my season</button>
+      <button class="btn ghost" onclick="go('kibbe')">Find my silhouette</button></div></div>
+  <div class="fan" aria-hidden="true">${fans.map((p,i)=>{
+    const angle=(i-(fans.length-1)/2)*9;
+    return `<div class="fcard" style="transform:translateX(-50%) rotate(${angle}deg);background:linear-gradient(180deg, ${p[2]} 0%, ${p[3]} 34%, ${p[0]} 68%, ${p[4]} 100%);z-index:${i}"></div>`;}).join("")}</div></div>
+  <div class="grid3">${[
+    ["Color season","Place your face in the oval, then see yourself at the center of 12 radial sun dials — or use the draping mirror and the no-photo quiz.","color","Begin with color"],
+    ["Silhouette &amp; yin–yang","Your height plus seventeen questions about bone, flesh, feature and how clothes actually fit reveal your Kibbe type and the lines your body already draws.","kibbe","Take the silhouette quiz"],
+    ["Your dossier","Season and silhouette merge into one page: palette, fabrics, lines and celebrity mirrors.","dossier","Open my dossier"]
+  ].map(([t,d,dest,cta])=>`<div class="panel"><h3 class="display">${t}</h3><p class="note" style="margin-bottom:12px">${d}</p>
+    <button class="btn ghost small" onclick="go('${dest}')">${cta}</button></div>`).join("")}</div>`;
+}
+
+/* ———————— SHELL ———————— */
+function render(){
+  const navItems=[["home","Home"],["color","Color"],["kibbe","Silhouette"],["dossier","My dossier"],["library","Library"]];
+  $("nav").innerHTML=`<button class="wordmark" onclick="go('home')">Mirror, <span>Mirror</span></button>`+
+    navItems.map(([k,l])=>`<button class="navbtn${S.page===k?" on":""}" onclick="go('${k}')">${l}</button>`).join("");
+  const m=$("main");
+  m.innerHTML=(S.page==="home"?renderHome():S.page==="color"?renderColor():S.page==="kibbe"?renderKibbe()
+    :S.page==="dossier"?renderDossier():renderLibrary())
+    +`<input id="file" type="file" accept="image/*" style="display:none">`;
+  $("file").onchange=onFile;
+  if(S.page==="color"&&S.ctab==="photo")setupPlacer();
+  if(S.page==="color"&&S.ctab==="dials")setupDials();
+}
+render();
+</script>
+</body>
+</html>
