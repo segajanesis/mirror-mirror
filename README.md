@@ -1,2 +1,10 @@
-# mirror-mirror
-color analysis utility for personal style that doesn't use AI or internet
+# Mirror, Mirror
+
+**Mirror, Mirror** is an offline pocket stylist that helps you explore your personal color season and silhouette type.
+
+## What it does
+
+- Guides you through the 12-season color system
+- Lets you compare palettes using interactive sun dials and color draping
+
+> Color analysis and silhouette typing are interpretive style frameworks, not strict rules. Use the results as inspiration and trust your own eye.
